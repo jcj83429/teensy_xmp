@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#define LIBXMP_CORE_PLAYER
+
 #define XMP_VERSION "4.4.1"
 #define XMP_VERCODE 0x040401
 #define XMP_VER_MAJOR 4

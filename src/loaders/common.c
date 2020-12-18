@@ -24,7 +24,7 @@
 #include <sys/types.h>
 #include <stdarg.h>
 #ifndef WIN32
-#include <dirent.h>
+//#include <dirent.h>
 #endif
 
 #include "xmp.h"

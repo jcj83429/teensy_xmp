@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#define LIBXMP_CORE_PLAYER
 #include <stdlib.h>
 #include <string.h>
 #ifndef LIBXMP_CORE_PLAYER
