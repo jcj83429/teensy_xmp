@@ -46,11 +46,11 @@ fail1:
 
 void TeensyXmp::stop(){
     if(playState != TeensyXmpState::STOP){
+        playState = TeensyXmpState::STOP;
         xmp_end_player(xmpctx);
         xmp_release_module(xmpctx);
         xmp_free_context(xmpctx);
     }
-    playState = TeensyXmpState::STOP;
     posMs = 0;
 }
 
