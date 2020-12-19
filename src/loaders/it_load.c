@@ -509,7 +509,7 @@ static int load_old_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 	xxi->vol = 0x40;
 
 	if (k) {
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), k);
+		xxi->sub = xmp_calloc(sizeof(struct xmp_subinstrument), k);
 		if (xxi->sub == NULL) {
 			return -1;
 		}
@@ -658,7 +658,7 @@ static int load_new_it_instrument(struct xmp_instrument *xxi, HIO_HANDLE *f)
 	xxi->vol = i2h.gbv >> 1;
 
 	if (k) {
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), k);
+		xxi->sub = xmp_calloc(sizeof(struct xmp_subinstrument), k);
 		if (xxi->sub == NULL)
 			return -1;
 
@@ -701,7 +701,7 @@ static int load_it_sample(struct module_data *m, int i, int start,
 	int j, k;
 
 	if (sample_mode) {
-		mod->xxi[i].sub = calloc(sizeof(struct xmp_subinstrument), 1);
+		mod->xxi[i].sub = xmp_calloc(sizeof(struct xmp_subinstrument), 1);
 		if (mod->xxi[i].sub == NULL) {
 			return -1;
 		}
@@ -849,7 +849,7 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			uint8 *buf;
 			int ret;
 
-			buf = calloc(1, xxs->len * 2);
+			buf = xmp_calloc(1, xxs->len * 2);
 			if (buf == NULL)
 				return -1;
 
@@ -871,13 +871,13 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
 				if (pos < 0) {
-					free(buf);
+					xmp_free(buf);
 					return -1;
 				}
 				ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD |
 							cvt, &m->xsmp[i], buf);
 				if (ret < 0) {
-					free(buf);
+					xmp_free(buf);
 					return -1;
 				}
 				hio_seek(f, pos, SEEK_SET);
@@ -886,11 +886,11 @@ static int load_it_sample(struct module_data *m, int i, int start,
 			ret = libxmp_load_sample(m, NULL, SAMPLE_FLAG_NOLOAD | cvt,
 					  &mod->xxs[i], buf);
 			if (ret < 0) {
-				free(buf);
+				xmp_free(buf);
 				return -1;
 			}
 
-			free(buf);
+			xmp_free(buf);
 		} else {
 			if (ish.flags & IT_SMP_SLOOP) {
 				long pos = hio_tell(f);
@@ -1093,18 +1093,18 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	}
 
 	if (mod->ins) {
-		pp_ins = calloc(4, mod->ins);
+		pp_ins = xmp_calloc(4, mod->ins);
 		if (pp_ins == NULL)
 			goto err;
 	} else {
 		pp_ins = NULL;
 	}
 
-	pp_smp = calloc(4, mod->smp);
+	pp_smp = xmp_calloc(4, mod->smp);
 	if (pp_smp == NULL)
 		goto err2;
 
-	pp_pat = calloc(4, mod->pat);
+	pp_pat = xmp_calloc(4, mod->pat);
 	if (pp_pat == NULL)
 		goto err3;
 
@@ -1178,7 +1178,7 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 
 	/* Alloc extra samples for sustain loop */
 	if (mod->smp > 0) {
-		m->xsmp = calloc(sizeof (struct xmp_sample), mod->smp);
+		m->xsmp = xmp_calloc(sizeof (struct xmp_sample), mod->smp);
 		if (m->xsmp == NULL) {
 			goto err4;
 		}
@@ -1321,14 +1321,14 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 		}
 	}
 
-	free(pp_pat);
-	free(pp_smp);
-	free(pp_ins);
+	xmp_free(pp_pat);
+	xmp_free(pp_smp);
+	xmp_free(pp_ins);
 
 	/* Song message */
 
 	if (ifh.special & IT_HAS_MSG) {
-		if ((m->comment = malloc(ifh.msglen + 1)) != NULL) {
+		if ((m->comment = xmp_malloc(ifh.msglen + 1)) != NULL) {
 			hio_seek(f, start + ifh.msgofs, SEEK_SET);
 
 			D_(D_INFO "Message length : %d", ifh.msglen);
@@ -1375,11 +1375,11 @@ static int it_load(struct module_data *m, HIO_HANDLE *f, const int start)
 	return 0;
 
 err4:
-	free(pp_pat);
+	xmp_free(pp_pat);
 err3:
-	free(pp_smp);
+	xmp_free(pp_smp);
 err2:
-	free(pp_ins);
+	xmp_free(pp_ins);
 err:
 	return -1;
 }

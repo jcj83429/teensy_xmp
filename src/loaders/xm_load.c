@@ -100,7 +100,7 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 
 	size = xph.datasize;
 
-	pat = patbuf = calloc(1, size);
+	pat = patbuf = xmp_calloc(1, size);
 	if (patbuf == NULL) {
 		goto err;
 	}
@@ -286,12 +286,12 @@ static int load_xm_pattern(struct module_data *m, int num, int version, HIO_HAND
 		}
 		event->vol = 0;
 	}
-	free(patbuf);
+	xmp_free(patbuf);
 
 	return 0;
 
 err2:
-	free(patbuf);
+	xmp_free(patbuf);
 err:
 	return -1;
 }

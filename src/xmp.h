@@ -353,6 +353,10 @@ EXPORT int         xmp_smix_channel_pan (xmp_context, int, int);
 EXPORT int         xmp_smix_load_sample (xmp_context, int, char *);
 EXPORT int         xmp_smix_release_sample (xmp_context, int);
 
+void *xmp_malloc(size_t size);
+void xmp_free(void *ptr);
+void *xmp_calloc(size_t n, size_t size);
+
 #ifdef __cplusplus
 }
 #endif

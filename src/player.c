@@ -1541,13 +1541,13 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 	f->pbreak = 0;
 	f->rowdelay_set = 0;
 
-	f->loop = calloc(p->virt.virt_channels, sizeof(struct pattern_loop));
+	f->loop = xmp_calloc(p->virt.virt_channels, sizeof(struct pattern_loop));
 	if (f->loop == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
 		goto err;
 	}
 
-	p->xc_data = calloc(p->virt.virt_channels, sizeof(struct channel_data));
+	p->xc_data = xmp_calloc(p->virt.virt_channels, sizeof(struct channel_data));
 	if (p->xc_data == NULL) {
 		ret = -XMP_ERROR_SYSTEM;
 		goto err1;
@@ -1568,10 +1568,10 @@ int xmp_start_player(xmp_context opaque, int rate, int format)
 
 #ifndef LIBXMP_CORE_PLAYER
     err2:
-	free(p->xc_data);
+	xmp_free(p->xc_data);
 #endif
     err1:
-	free(f->loop);
+	xmp_free(f->loop);
     err:
 	return ret;
 }
@@ -1788,8 +1788,8 @@ void xmp_end_player(xmp_context opaque)
 
 	libxmp_virt_off(ctx);
 
-	free(p->xc_data);
-	free(f->loop);
+	xmp_free(p->xc_data);
+	xmp_free(f->loop);
 
 	p->xc_data = NULL;
 	f->loop = NULL;

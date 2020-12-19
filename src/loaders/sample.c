@@ -269,7 +269,7 @@ int libxmp_load_sample(struct module_data *m, HIO_HANDLE *f, int flags, struct x
 	}
 
 	/* add guard bytes before the buffer for higher order interpolation */
-	xxs->data = malloc(bytelen + extralen + unroll_extralen + 4);
+	xxs->data = xmp_malloc(bytelen + extralen + unroll_extralen + 4);
 	if (xxs->data == NULL) {
 		goto err;
 	}
@@ -409,7 +409,7 @@ int libxmp_load_sample(struct module_data *m, HIO_HANDLE *f, int flags, struct x
 
 #ifndef LIBXMP_CORE_PLAYER
     err2:
-	free(xxs->data - 4);
+	xmp_free(xxs->data - 4);
 #endif
     err:
 	return -1;

@@ -106,7 +106,7 @@ MFILE *mopen(void *ptr, long size)
 {
 	MFILE *m;
 
-	m = (MFILE *)malloc(sizeof (MFILE));
+	m = (MFILE *)xmp_malloc(sizeof (MFILE));
 	if (m == NULL)
 		return NULL;
 	
@@ -119,7 +119,7 @@ MFILE *mopen(void *ptr, long size)
 
 int mclose(MFILE *m)
 {
-	free(m);
+	xmp_free(m);
 	return 0;
 }
 

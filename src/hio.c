@@ -299,7 +299,7 @@ HIO_HANDLE *hio_open(void *path, char *mode)
 {
 	HIO_HANDLE *h;
 
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
+	h = (HIO_HANDLE *)xmp_malloc(sizeof (HIO_HANDLE));
 	if (h == NULL)
 		goto err;
 	
@@ -318,7 +318,7 @@ HIO_HANDLE *hio_open(void *path, char *mode)
     err3:
 	fclose(h->handle.file);
     err2:
-	free(h);
+	xmp_free(h);
     err:
 	return NULL;
 }
@@ -327,7 +327,7 @@ HIO_HANDLE *hio_open_mem(void *ptr, long size)
 {
 	HIO_HANDLE *h;
 
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
+	h = (HIO_HANDLE *)xmp_malloc(sizeof (HIO_HANDLE));
 	if (h == NULL)
 		return NULL;
 	
@@ -343,7 +343,7 @@ HIO_HANDLE *hio_open_file(FILE *f)
 {
 	HIO_HANDLE *h;
 
-	h = (HIO_HANDLE *)malloc(sizeof (HIO_HANDLE));
+	h = (HIO_HANDLE *)xmp_malloc(sizeof (HIO_HANDLE));
 	if (h == NULL)
 		return NULL;
 	
@@ -370,7 +370,7 @@ int hio_close(HIO_HANDLE *h)
 		ret = -1;
 	}
 
-	free(h);
+	xmp_free(h);
 	return ret;
 }
 

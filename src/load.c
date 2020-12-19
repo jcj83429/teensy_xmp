@@ -244,7 +244,7 @@ static char *get_dirname(char *name)
 
 	if ((div = strrchr(name, '/'))) {
 		len = div - name + 1;
-		dirname = malloc(len + 1);
+		dirname = xmp_malloc(len + 1);
 		if (dirname != NULL) {
 			memcpy(dirname, name, len);
 			dirname[len] = 0;
@@ -385,8 +385,8 @@ static int load_module(xmp_context opaque, HIO_HANDLE *h)
 #endif
 
 	if (test_result < 0) {
-		free(m->basename);
-		free(m->dirname);
+		xmp_free(m->basename);
+		xmp_free(m->dirname);
 		return -XMP_ERROR_FORMAT;
 	}
 
@@ -613,58 +613,58 @@ void xmp_release_module(xmp_context opaque)
 
 	if (mod->xxt != NULL) {
 		for (i = 0; i < mod->trk; i++) {
-			free(mod->xxt[i]);
+			xmp_free(mod->xxt[i]);
 		}
-		free(mod->xxt);
+		xmp_free(mod->xxt);
 	}
 
 	if (mod->xxp != NULL) {
 		for (i = 0; i < mod->pat; i++) {
-			free(mod->xxp[i]);
+			xmp_free(mod->xxp[i]);
 		}
-		free(mod->xxp);
+		xmp_free(mod->xxp);
 	}
 
 	if (mod->xxi != NULL) {
 		for (i = 0; i < mod->ins; i++) {
-			free(mod->xxi[i].sub);
-			free(mod->xxi[i].extra);
+			xmp_free(mod->xxi[i].sub);
+			xmp_free(mod->xxi[i].extra);
 		}
-		free(mod->xxi);
+		xmp_free(mod->xxi);
 	}
 
 	if (mod->xxs != NULL) {
 		for (i = 0; i < mod->smp; i++) {
 			if (mod->xxs[i].data != NULL) {
-				free(mod->xxs[i].data - 4);
+				xmp_free(mod->xxs[i].data - 4);
 			}
 		}
-		free(mod->xxs);
-		free(m->xtra);
+		xmp_free(mod->xxs);
+		xmp_free(m->xtra);
 	}
 
 #ifndef LIBXMP_CORE_DISABLE_IT
 	if (m->xsmp != NULL) {
 		for (i = 0; i < mod->smp; i++) {
 			if (m->xsmp[i].data != NULL) {
-				free(m->xsmp[i].data - 4);
+				xmp_free(m->xsmp[i].data - 4);
 			}
 		}
-		free(m->xsmp);
+		xmp_free(m->xsmp);
 	}
 #endif
 
 	if (m->scan_cnt) {
 		for (i = 0; i < mod->len; i++)
-			free(m->scan_cnt[i]);
-		free(m->scan_cnt);
+			xmp_free(m->scan_cnt[i]);
+		xmp_free(m->scan_cnt);
 	}
 
-	free(m->comment);
+	xmp_free(m->comment);
 
 	D_("free dirname/basename");
-	free(m->dirname);
-	free(m->basename);
+	xmp_free(m->dirname);
+	xmp_free(m->basename);
 }
 
 void xmp_scan_module(xmp_context opaque)

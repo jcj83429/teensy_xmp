@@ -803,11 +803,11 @@ int libxmp_mixer_on(struct context_data *ctx, int rate, int format, int c4rate)
 {
 	struct mixer_data *s = &ctx->s;
 
-	s->buffer = calloc(2, XMP_MAX_FRAMESIZE);
+	s->buffer = xmp_calloc(2, XMP_MAX_FRAMESIZE);
 	if (s->buffer == NULL)
 		goto err;
 
-	s->buf32 = calloc(sizeof(int), XMP_MAX_FRAMESIZE);
+	s->buf32 = xmp_calloc(sizeof(int), XMP_MAX_FRAMESIZE);
 	if (s->buf32 == NULL)
 		goto err1;
 
@@ -824,7 +824,7 @@ int libxmp_mixer_on(struct context_data *ctx, int rate, int format, int c4rate)
 	return 0;
 
     err1:
-	free(s->buffer);
+	xmp_free(s->buffer);
     err:
 	return -1;
 }
@@ -833,8 +833,8 @@ void libxmp_mixer_off(struct context_data *ctx)
 {
 	struct mixer_data *s = &ctx->s;
 
-	free(s->buffer);
-	free(s->buf32);
+	xmp_free(s->buffer);
+	xmp_free(s->buf32);
 	s->buf32 = NULL;
 	s->buffer = NULL;
 }

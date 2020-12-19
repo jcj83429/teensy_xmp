@@ -72,11 +72,11 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 		return -XMP_ERROR_STATE;
 	}
 
-	smix->xxi = calloc(sizeof (struct xmp_instrument), smp);
+	smix->xxi = xmp_calloc(sizeof (struct xmp_instrument), smp);
 	if (smix->xxi == NULL) {
 		goto err;
 	}
-	smix->xxs = calloc(sizeof (struct xmp_sample), smp);
+	smix->xxs = xmp_calloc(sizeof (struct xmp_sample), smp);
 	if (smix->xxs == NULL) {
 		goto err1;
 	}
@@ -87,7 +87,7 @@ int xmp_start_smix(xmp_context opaque, int chn, int smp)
 	return 0;
 
     err1:
-	free(smix->xxi);
+	xmp_free(smix->xxi);
     err:
 	return -XMP_ERROR_INTERNAL;
 }
@@ -200,7 +200,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 		
 	/* Init instrument */
 
-	xxi->sub = calloc(sizeof(struct xmp_subinstrument), 1);
+	xxi->sub = xmp_calloc(sizeof(struct xmp_subinstrument), 1);
 	if (xxi->sub == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err1;
@@ -263,7 +263,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	xxs->lpe = 0;
 	xxs->flg = bits == 16 ? XMP_SAMPLE_16BIT : 0;
 
-	xxs->data = malloc(size);
+	xxs->data = xmp_malloc(size);
 	if (xxs->data == NULL) {
 		retval = -XMP_ERROR_SYSTEM;
 		goto err2;
@@ -281,7 +281,7 @@ int xmp_smix_load_sample(xmp_context opaque, int num, char *path)
 	return 0;
 	
     err2:
-	free(xxi->sub);
+	xmp_free(xxi->sub);
 	xxi->sub = NULL;
     err1:
 	hio_close(h);
@@ -298,8 +298,8 @@ int xmp_smix_release_sample(xmp_context opaque, int num)
 		return -XMP_ERROR_INVALID;
 	}
 
-	free(smix->xxs[num].data);
-	free(smix->xxi[num].sub);
+	xmp_free(smix->xxs[num].data);
+	xmp_free(smix->xxi[num].sub);
 
 	smix->xxs[num].data = NULL;
 	smix->xxi[num].sub = NULL;
@@ -317,6 +317,6 @@ void xmp_end_smix(xmp_context opaque)
 		xmp_smix_release_sample(opaque, i);
 	}
 
-	free(smix->xxs);
-	free(smix->xxi);
+	xmp_free(smix->xxs);
+	xmp_free(smix->xxi);
 }

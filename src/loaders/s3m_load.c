@@ -298,11 +298,11 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 
 	libxmp_copy_adjust(mod->name, sfh.name, 28);
 
-	pp_ins = calloc(2, sfh.insnum);
+	pp_ins = xmp_calloc(2, sfh.insnum);
 	if (pp_ins == NULL)
 		goto err;
 
-	pp_pat = calloc(2, sfh.patnum);
+	pp_pat = xmp_calloc(2, sfh.patnum);
 	if (pp_pat == NULL)
 		goto err2;
 
@@ -513,7 +513,7 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		struct xmp_sample *xxs = &mod->xxs[i];
 		struct xmp_subinstrument *sub;
 
-		xxi->sub = calloc(sizeof(struct xmp_subinstrument), 1);
+		xxi->sub = xmp_calloc(sizeof(struct xmp_subinstrument), 1);
 		if (xxi->sub == NULL) {
 			goto err3;
 		}
@@ -642,8 +642,8 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 		}
 	}
 
-	free(pp_pat);
-	free(pp_ins);
+	xmp_free(pp_pat);
+	xmp_free(pp_ins);
 
 	m->quirk |= QUIRKS_ST3 | QUIRK_ARPMEM;
 	m->read_event_type = READ_EVENT_ST3;
@@ -651,9 +651,9 @@ static int s3m_load(struct module_data *m, HIO_HANDLE * f, const int start)
 	return 0;
 
 err3:
-	free(pp_pat);
+	xmp_free(pp_pat);
 err2:
-	free(pp_ins);
+	xmp_free(pp_ins);
 err:
 	return -1;
 }

@@ -1,5 +1,21 @@
 #include "teensy_xmp.h"
 
+void __attribute__((weak)) *xmp_malloc(size_t size){
+    return malloc(size);
+}
+
+void __attribute__((weak)) xmp_free(void *ptr){
+    return free(ptr);
+}
+
+void *xmp_calloc(size_t n, size_t size){
+    void *mem = xmp_malloc(n * size);
+    if(mem != NULL){
+        memset(mem, 0, n * size);
+    }
+    return mem;
+}
+
 bool TeensyXmp::playModuleInMemory(void *buf, int size){
     if(playState != TeensyXmpState::STOP){
         stop();
