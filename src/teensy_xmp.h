@@ -19,7 +19,7 @@ class TeensyXmp : public AudioStream
 public:
     TeensyXmp(void) : AudioStream(0, NULL){
         playState = TeensyXmpState::STOP;
-        posMs = 0;
+        posMs = 0; lenMs = 0;
         decodeBuf[0] = decodeBuf[1] = NULL;
         decodeBufSmps[0] = decodeBufSmps[1] = 0;
         playingBuf = 0;
@@ -29,12 +29,22 @@ public:
     bool playModuleWithCallbacks(struct xmp_io_callbacks *cb);
     void stop(void);
     bool pause(bool paused);
+	// Using seekSec is not recommended because seeking in modules is not accurate at all.
+	// libxmp can only seek to the nearest pattern start.
+	// Patterns are often multiple seconds long
+	// Use seekNextPos() and seekPrevPos() to implement fast-forward and rewind
+	bool seekSec(uint32_t timesec);
+	bool seekNextPos();
+	bool seekPrevPos();
     bool isPlaying(void){
         return playState != TeensyXmpState::STOP;
     }
     int positionMs(void){
         return posMs;
     }
+	int lengthMs(void){
+		return lenMs;
+	}
 
     void update(void);
     
@@ -43,12 +53,16 @@ private:
     xmp_context xmpctx;
     TeensyXmpState playState;
     int posMs;
+	int lenMs;
     int16_t *decodeBuf[2];
     // samples remaining in decodeBuf[i], each sample is 4 bytes (int16_t * 2)
     int decodeBufSmps[2];
     int playingBuf;
     
     friend void decodeModule(void);
+	
+	bool preSeek(void);
+	bool postSeek(void);
 };
 
 #endif

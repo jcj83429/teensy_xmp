@@ -170,6 +170,8 @@ fail1:
 void TeensyXmp::stop(){
     NVIC_DISABLE_IRQ(IRQ_AUDIOCODEC);
     playingTeensyXmp = NULL;
+	// at this point, it is not possible for updateModule to call stop()
+	// so we are the only one that can be here.
     if(playState != TeensyXmpState::STOP){
         playState = TeensyXmpState::STOP;
         xmp_end_player(xmpctx);
@@ -185,6 +187,7 @@ void TeensyXmp::stop(){
         decodeBuf[0] = NULL;
     }
     posMs = 0;
+	lenMs = 0;
 }
 
 bool TeensyXmp::pause(bool paused){
@@ -196,6 +199,68 @@ bool TeensyXmp::pause(bool paused){
 	}else{
 		playState = TeensyXmpState::PLAY;
 	}
+	return true;
+}
+
+bool TeensyXmp::seekSec(uint32_t timesec){
+	if(!preSeek()){
+		return false;
+	}
+	int newPosIdx = xmp_seek_time(xmpctx, timesec * 1000);
+	Serial.print("xmp_seek_time returned ");
+	Serial.println(newPosIdx);
+	if(newPosIdx < 0){
+		return false;
+	}
+	return postSeek();
+}
+
+bool TeensyXmp::seekNextPos(){
+	if(!preSeek()){
+		return false;
+	}
+	int newPosIdx = xmp_next_position(xmpctx);
+	Serial.print("xmp_next_position returned ");
+	Serial.println(newPosIdx);
+	if(newPosIdx < 0){
+		return false;
+	}
+	return postSeek();
+}
+
+bool TeensyXmp::seekPrevPos(){
+	if(!preSeek()){
+		return false;
+	}
+	int newPosIdx = xmp_prev_position(xmpctx);
+	Serial.print("xmp_prev_position returned ");
+	Serial.println(newPosIdx);
+	if(newPosIdx < 0){
+		return false;
+	}
+	return postSeek();
+}
+
+bool TeensyXmp::preSeek(){
+	if(playState == TeensyXmpState::STOP){
+		return false;
+	}
+	return pause(true);
+}
+
+bool TeensyXmp::postSeek(){
+	// flush old samples
+	decodeBufSmps[0] = decodeBufSmps[1] = 0;
+	playingBuf = 0;
+	pause(false);
+	if (!NVIC_IS_ACTIVE(IRQ_AUDIOCODEC)){
+        NVIC_TRIGGER_INTERRUPT(IRQ_AUDIOCODEC);
+    }
+	if(playState == TeensyXmpState::STOP){
+		// something went wrong in decodeModule
+		return false;
+	}
+	return true;
 }
 
 void TeensyXmp::update(){
@@ -267,6 +332,7 @@ void decodeModule(void){
     }else{
         struct xmp_frame_info fi;
         xmp_get_frame_info(playingTeensyXmp->xmpctx, &fi);
+		playingTeensyXmp->lenMs = fi.total_time;
         playingTeensyXmp->posMs = fi.time;
         playingTeensyXmp->decodeBufSmps[decodingBuf] = TEENSY_XMP_BUF_SMPS;
         // now update() may use the new buffer
