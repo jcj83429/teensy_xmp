@@ -187,6 +187,17 @@ void TeensyXmp::stop(){
     posMs = 0;
 }
 
+bool TeensyXmp::pause(bool paused){
+	if(playState == TeensyXmpState::STOP){
+		return false;
+	}
+	if(paused){
+		playState = TeensyXmpState::PAUSE;
+	}else{
+		playState = TeensyXmpState::PLAY;
+	}
+}
+
 void TeensyXmp::update(){
     if(playState != TeensyXmpState::PLAY){
         return;
