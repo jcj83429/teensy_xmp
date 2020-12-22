@@ -26,6 +26,7 @@ public:
     }
 
     bool playModuleInMemory(void *buf, int size);
+	bool playModuleWithCallbacks(struct xmp_io_callbacks *cb);
     void stop(void);
     bool isPlaying(void){
         return playState != TeensyXmpState::STOP;

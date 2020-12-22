@@ -310,6 +310,20 @@ struct xmp_frame_info {			/* Current frame information */
 	} channel_info[XMP_MAX_CHANNELS];
 };
 
+struct xmp_io_callbacks {
+	// return the number of elements read. Each element is of size "size"
+	size_t (*read)(void *user_data, void *buf, size_t size, size_t num);
+	// return 0 if seek was successful. Return negative if seek failed.
+	int (*seek)(void *user_data, long offset, int whence);
+	// return current offset, or negative for error
+	long (*tell)(void *user_data);
+	// return non-zero if eof
+    int (*eof)(void *user_data);
+	// size() can be set to NULL. 
+	// In that case, the seek implementation must support SEEK_END
+	long (*size)(void *user_data);
+	void *user_data;
+};
 
 typedef char *xmp_context;
 
@@ -343,6 +357,7 @@ EXPORT int         xmp_get_player      (xmp_context, int);
 EXPORT int         xmp_set_instrument_path (xmp_context, char *);
 EXPORT int         xmp_load_module_from_memory (xmp_context, void *, long);
 EXPORT int         xmp_load_module_from_file (xmp_context, void *, long);
+EXPORT int         xmp_load_module_from_callbacks (xmp_context, struct xmp_io_callbacks *cb);
 
 /* External sample mixer API */
 EXPORT int         xmp_start_smix       (xmp_context, int, int);

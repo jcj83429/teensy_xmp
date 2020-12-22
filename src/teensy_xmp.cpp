@@ -74,7 +74,74 @@ bool TeensyXmp::playModuleInMemory(void *buf, int size){
 
     playingTeensyXmp = this;
     playState = TeensyXmpState::PLAY;
-    //decodeModule();
+    decodeModule();
+    if(playState != TeensyXmpState::PLAY){
+        // something went wrong in decodeModule
+        return false;
+    }
+
+    attachInterruptVector((IRQ_NUMBER_t)IRQ_AUDIOCODEC, decodeModule);
+    if(NVIC_GET_PRIORITY(IRQ_AUDIO) >= IRQ_AUDIOCODEC_PRIO){
+        NVIC_SET_PRIORITY(IRQ_AUDIO, IRQ_AUDIOCODEC_PRIO-16);
+    }
+    NVIC_SET_PRIORITY(IRQ_AUDIOCODEC, IRQ_AUDIOCODEC_PRIO);
+    NVIC_ENABLE_IRQ(IRQ_AUDIOCODEC);
+
+    return true;
+    
+fail4:
+    xmp_release_module(xmpctx);
+fail3:
+    xmp_free_context(xmpctx);
+fail2:
+    free(decodeBuf[1]);
+fail1:
+    free(decodeBuf[0]);
+    return false;
+}
+
+bool TeensyXmp::playModuleWithCallbacks(struct xmp_io_callbacks *cb){
+    if(playState != TeensyXmpState::STOP){
+        stop();
+    }
+    
+    decodeBuf[0] = (int16_t*)malloc(sizeof(int16_t) * 2 * TEENSY_XMP_BUF_SMPS);
+    if(decodeBuf[0] == NULL){
+        Serial.println("playModuleInMemory failed to allocate decodeBuf");
+        return false;
+    }
+
+    decodeBuf[1] = (int16_t*)malloc(sizeof(int16_t) * 2 * TEENSY_XMP_BUF_SMPS);
+    if(decodeBuf[0] == NULL){
+        Serial.println("playModuleInMemory failed to allocate decodeBuf");
+        goto fail1;
+    }
+    
+    int err;
+    xmpctx = xmp_create_context();
+    if(xmpctx == NULL){
+        Serial.print("xmp_create_context returned null");
+        goto fail2;
+    }
+    err = xmp_load_module_from_callbacks(xmpctx, cb);
+    if(err){
+        Serial.print("xmp_load_module_from_callbacks failed with error ");
+        Serial.println(err);
+        goto fail3;
+    }
+    err = xmp_start_player(xmpctx, 44100, 0);
+    if(err){
+        Serial.print("xmp_start_player failed with error ");
+        Serial.println(err);
+        goto fail4;
+    }
+    decodeBufSmps[0] = decodeBufSmps[1] = 0;
+    playingBuf = 0;
+    lastErr = 0;
+
+    playingTeensyXmp = this;
+    playState = TeensyXmpState::PLAY;
+    decodeModule();
     if(playState != TeensyXmpState::PLAY){
         // something went wrong in decodeModule
         return false;

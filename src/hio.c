@@ -62,6 +62,13 @@ int8 hio_read8s(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread8s(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &ret, 1, 1);
+		if (bytes_read != 1) {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -82,6 +89,13 @@ uint8 hio_read8(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread8(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &ret, 1, 1);
+		if (bytes_read != 1) {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -102,6 +116,16 @@ uint16 hio_read16l(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread16l(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[2];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 2);
+		if (bytes_read == 2) {
+			ret = tmp[1] << 8 | tmp[0];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -122,6 +146,16 @@ uint16 hio_read16b(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread16b(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[2];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 2);
+		if (bytes_read == 2) {
+			ret = tmp[0] << 8 | tmp[1];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -142,6 +176,16 @@ uint32 hio_read24l(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread24l(h->handle.mem); 
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[3];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 3);
+		if (bytes_read == 3) {
+			ret = tmp[2] << 16 | tmp[1] << 8 | tmp[0];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -162,6 +206,16 @@ uint32 hio_read24b(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread24b(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[3];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 3);
+		if (bytes_read == 3) {
+			ret = tmp[0] << 16 | tmp[1] << 8 | tmp[2];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -182,6 +236,16 @@ uint32 hio_read32l(HIO_HANDLE *h)
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread32l(h->handle.mem);
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[4];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 4);
+		if (bytes_read == 4) {
+			ret = tmp[3] << 24 | tmp[2] << 16 | tmp[1] << 8 | tmp[0];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -201,6 +265,16 @@ uint32 hio_read32b(HIO_HANDLE *h)
 		break;
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread32b(h->handle.mem);
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		uint8 tmp[4];
+		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 4);
+		if (bytes_read == 4) {
+			ret = tmp[0] << 24 | tmp[1] << 16 | tmp[2] << 8 | tmp[3];
+		} else {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -227,6 +301,13 @@ size_t hio_read(void *buf, size_t size, size_t num, HIO_HANDLE *h)
 			h->error = errno;
 		}
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		ret = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, buf, size, num);
+		if (ret != num) {
+			h->error = EOF;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -249,6 +330,13 @@ int hio_seek(HIO_HANDLE *h, long offset, int whence)
 			h->error = errno;
 		}
 		break;
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		ret = (* h->handle.callbacks->seek)(h->handle.callbacks->user_data, offset, whence);
+		if (ret < 0) {
+			h->error = ret;
+		}
+		break;
+	}
 	}
 
 	return ret;
@@ -265,12 +353,13 @@ long hio_tell(HIO_HANDLE *h)
 			h->error = errno;
 		}
 		break;
-	case HIO_HANDLE_TYPE_MEMORY:
-		ret = mtell(h->handle.mem);
+	case HIO_HANDLE_TYPE_CALLBACKS: {
+		ret = (* h->handle.callbacks->tell)(h->handle.callbacks->user_data);
 		if (ret < 0) {
-			h->error = errno;
+			h->error = ret;
 		}
 		break;
+	}
 	}
 
 	return ret;
@@ -283,6 +372,8 @@ int hio_eof(HIO_HANDLE *h)
 		return feof(h->handle.file);
 	case HIO_HANDLE_TYPE_MEMORY:
 		return meof(h->handle.mem);
+	case HIO_HANDLE_TYPE_CALLBACKS:
+		return (* h->handle.callbacks->eof)(h->handle.callbacks->user_data);
 	default:
 		return EOF;
 	}
@@ -355,6 +446,43 @@ HIO_HANDLE *hio_open_file(FILE *f)
 	return h;
 }
 
+HIO_HANDLE *hio_open_callbacks(struct xmp_io_callbacks *cb)
+{
+	if (cb == NULL) {
+		return NULL;
+	}
+	
+	HIO_HANDLE *h;
+	h = (HIO_HANDLE *)xmp_malloc(sizeof (HIO_HANDLE));
+	if (h == NULL)
+		return NULL;
+
+	h->error = 0;
+	h->type = HIO_HANDLE_TYPE_CALLBACKS;
+	h->handle.callbacks = cb;
+	if (cb->size != NULL) {
+		h->size = (* cb->size)(cb->user_data);
+	} else {
+		int error = (* cb->seek)(cb->user_data, 0, SEEK_END);
+		if (error) {
+			goto fail;
+		}
+		h->size = (* cb->tell)(cb->user_data);
+		if (h->size < 0) {
+			goto fail;
+		}
+		error = (* cb->seek)(cb->user_data, 0, SEEK_SET);
+		if (error) {
+			goto fail;
+		}
+	}
+
+	return h;
+fail:
+	xmp_free(h);
+	return NULL;
+}
+
 int hio_close(HIO_HANDLE *h)
 {
 	int ret;
@@ -365,6 +493,9 @@ int hio_close(HIO_HANDLE *h)
 		break;
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mclose(h->handle.mem);
+		break;
+	case HIO_HANDLE_TYPE_CALLBACKS:
+		ret = 0;
 		break;
 	default:
 		ret = -1;
