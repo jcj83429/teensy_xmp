@@ -22,6 +22,10 @@ void __attribute__((weak)) xmp_free(void *ptr){
     return free(ptr);
 }
 
+void __attribute__((weak)) *xmp_realloc(void *ptr, size_t size){
+	return realloc(ptr, size);
+}
+
 void *xmp_calloc(size_t n, size_t size){
     void *mem = xmp_malloc(n * size);
     if(mem != NULL){

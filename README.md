@@ -12,5 +12,5 @@ Examples will be added later.
 ## Using custom malloc and PSRAM
 Due to the high memory requirement of module playback, many modules can't be played with a bare teensy 4.0/4.1.
 This library supports using a custom malloc to allocate memory in PSRAM or DTCM.
-To use a custom malloc, implement `void *xmp_malloc(size_t size)` and `void xmp_free(void *ptr)`.
+To use a custom malloc, implement `void *xmp_malloc(size_t size)`, `void xmp_free(void *ptr)` and `void *xmp_realloc(void *ptr, size_t size)`.
 An example of this will be added later.

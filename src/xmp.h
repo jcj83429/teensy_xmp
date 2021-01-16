@@ -370,6 +370,7 @@ EXPORT int         xmp_smix_release_sample (xmp_context, int);
 
 void *xmp_malloc(size_t size);
 void xmp_free(void *ptr);
+void *xmp_realloc(void *ptr, size_t size);
 void *xmp_calloc(size_t n, size_t size);
 
 #ifdef __cplusplus

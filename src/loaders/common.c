@@ -153,7 +153,7 @@ int libxmp_alloc_pattern_tracks(struct xmp_module *mod, int num, int rows)
 /* Sample number adjustment by Vitamin/CAIG */
 struct xmp_sample *libxmp_realloc_samples(struct xmp_sample *buf, int *size, int new_size)
 {
-	buf = realloc(buf, sizeof (struct xmp_sample) * new_size);
+	buf = xmp_realloc(buf, sizeof (struct xmp_sample) * new_size);
 	if (buf == NULL)
 		return NULL;
 	if (new_size > *size)
