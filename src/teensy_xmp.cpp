@@ -342,3 +342,7 @@ void decodeModule(void){
         // now update() may use the new buffer
     }
 }
+
+void teensyXmpPrint(const char *s){
+	Serial.print(s);
+}

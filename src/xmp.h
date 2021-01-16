@@ -373,6 +373,11 @@ void xmp_free(void *ptr);
 void *xmp_realloc(void *ptr, size_t size);
 void *xmp_calloc(size_t n, size_t size);
 
+void teensyXmpPrint(const char *s);
+#define teensyXmpDebug(args...) do { char buf[1000]; snprintf(buf, 1000, args); teensyXmpPrint(buf); } while(0)
+// uncomment to see libxmp debug messages
+// #define DEBUG 1
+
 #ifdef __cplusplus
 }
 #endif

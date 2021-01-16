@@ -108,6 +108,7 @@ void __inline CLIB_DECL D_(const char *text, ...) { do {} while (0); }
 #else
 
 #ifdef DEBUG
+/*
 #define D_INFO "\x1b[33m"
 #define D_CRIT "\x1b[31m"
 #define D_WARN "\x1b[36m"
@@ -115,6 +116,11 @@ void __inline CLIB_DECL D_(const char *text, ...) { do {} while (0); }
 	printf("\x1b[33m%s \x1b[37m[%s:%d] " D_INFO, __FUNCTION__, \
 		__FILE__, __LINE__); printf (args); printf ("\x1b[0m\n"); \
 	} while (0)
+*/
+#define D_CRIT "  Error: "
+#define D_WARN "Warning: "
+#define D_INFO "   Info: "
+#define D_(args...) do { teensyXmpDebug("%s %d ", __FUNCTION__, __LINE__); teensyXmpDebug(args); teensyXmpDebug("\n");} while (0)
 #else
 #define D_(args...) do {} while (0)
 #endif
