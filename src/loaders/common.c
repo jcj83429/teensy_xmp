@@ -221,6 +221,7 @@ int libxmp_test_name(uint8 *s, int n)
 
 	return 0;
 }
+#endif
 
 /*
  * Honor Noisetracker effects:
@@ -261,7 +262,6 @@ void libxmp_decode_noisetracker_event(struct xmp_event *event, uint8 *mod_event)
 
 	libxmp_disable_continue_fx(event);
 }
-#endif
 
 void libxmp_decode_protracker_event(struct xmp_event *event, uint8 *mod_event)
 {
