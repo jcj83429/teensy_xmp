@@ -265,6 +265,7 @@ uint32 hio_read32b(HIO_HANDLE *h)
 		break;
 	case HIO_HANDLE_TYPE_MEMORY:
 		ret = mread32b(h->handle.mem);
+		break;
 	case HIO_HANDLE_TYPE_CALLBACKS: {
 		uint8 tmp[4];
 		int bytes_read = (* h->handle.callbacks->read)(h->handle.callbacks->user_data, &tmp, 1, 4);
@@ -351,6 +352,12 @@ long hio_tell(HIO_HANDLE *h)
 		ret = ftell(h->handle.file);
 		if (ret < 0) {
 			h->error = errno;
+		}
+		break;
+	case HIO_HANDLE_TYPE_MEMORY:
+		ret = mtell(h->handle.mem);
+		if (ret < 0) {
+			h->error = ret;
 		}
 		break;
 	case HIO_HANDLE_TYPE_CALLBACKS: {
