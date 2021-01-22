@@ -33,10 +33,11 @@ extern const struct format_loader libxmp_loader_mod;
 extern const struct format_loader libxmp_loader_it;
 extern const struct format_loader libxmp_loader_s3m;
 extern const struct format_loader libxmp_loader_flt;
+extern const struct format_loader libxmp_loader_st;
 
 extern const struct pw_format *const pw_format[];
 
-const struct format_loader *const format_loader[5] = {
+const struct format_loader *const format_loader[] = {
 	&libxmp_loader_xm,
 	&libxmp_loader_mod,
 #ifndef LIBXMP_CORE_DISABLE_IT
@@ -44,6 +45,7 @@ const struct format_loader *const format_loader[5] = {
 #endif
 	&libxmp_loader_s3m,
 	&libxmp_loader_flt,
+	&libxmp_loader_st,
 	NULL
 };
 

@@ -42,7 +42,6 @@ struct mod_header {
 };
 
 
-#ifndef LIBXMP_CORE_PLAYER
 /* Soundtracker 15-instrument module header */
 
 struct st_header {
@@ -52,4 +51,3 @@ struct st_header {
 	uint8 restart;
 	uint8 order[128];
 };
-#endif

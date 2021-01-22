@@ -205,8 +205,6 @@ void libxmp_read_title(HIO_HANDLE *f, char *t, int s)
 	libxmp_copy_adjust(t, buf, s);
 }
 
-#ifndef LIBXMP_CORE_PLAYER
-
 int libxmp_test_name(uint8 *s, int n)
 {
 	int i;
@@ -221,7 +219,6 @@ int libxmp_test_name(uint8 *s, int n)
 
 	return 0;
 }
-#endif
 
 /*
  * Honor Noisetracker effects:
