@@ -34,6 +34,24 @@ void *xmp_calloc(size_t n, size_t size){
     return mem;
 }
 
+// These "fast" functions are used to allocate fast internal memory (not PSRAM)
+// They should not be overridden
+void *xmp_malloc_fast(size_t size){
+    return malloc(size);
+}
+
+void xmp_free_fast(void *ptr){
+    return free(ptr);
+}
+
+void *xmp_realloc_fast(void *ptr, size_t size){
+	return realloc(ptr, size);
+}
+
+void *xmp_calloc_fast(size_t n, size_t size){
+    return calloc(n, size);
+}
+
 TeensyXmp *playingTeensyXmp = NULL;
 void decodeModule(void);
 
