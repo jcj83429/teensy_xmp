@@ -372,7 +372,30 @@ void libxmp_mixer_softmixer(struct context_data *ctx)
 
 	libxmp_mixer_prepare(ctx);
 
-	for (voc = 0; voc < p->virt.maxvoc; voc++) {
+	// Teensy: sort the voices by the sample used to optimize for PSRAM cache
+	int sortedVoc[p->virt.maxvoc];
+	for(int i = 0; i < p->virt.maxvoc; i++){
+		sortedVoc[i] = i;
+	}
+	for (int i = 0; i < p->virt.maxvoc; i++) {
+		int minSmpVoc = i;
+		for (int j = i + 1; j < p->virt.maxvoc; j++) {
+			if (p->virt.voice_array[sortedVoc[j]].smp < p->virt.voice_array[sortedVoc[minSmpVoc]].smp) {
+				minSmpVoc = j;
+			} else if (p->virt.voice_array[sortedVoc[j]].smp == p->virt.voice_array[sortedVoc[minSmpVoc]].smp) {
+				if(p->virt.voice_array[sortedVoc[j]].pos < p->virt.voice_array[sortedVoc[minSmpVoc]].pos){
+					minSmpVoc = j;
+				}
+			}
+		}
+		int tmp = sortedVoc[i];
+		sortedVoc[i] = sortedVoc[minSmpVoc];
+		sortedVoc[minSmpVoc] = tmp;
+	}
+
+	//for (voc = 0; voc < p->virt.maxvoc; voc++) {
+	for (int i = 0; i < p->virt.maxvoc; i++) {
+		voc = sortedVoc[i];
 		int c5spd;
 
 		vi = &p->virt.voice_array[voc];
